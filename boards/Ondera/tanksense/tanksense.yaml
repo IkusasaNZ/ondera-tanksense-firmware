@@ -1,0 +1,10 @@
+identifier: tanksense/nrf52840
+name: Tankse Monitoring
+vendor: Ondera
+type: mcu
+arch: arm
+ram: 256
+flash: 472
+toolchain:
+  - zephyr
+supported: []

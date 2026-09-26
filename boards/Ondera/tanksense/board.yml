@@ -1,0 +1,6 @@
+board:
+  name: tanksense
+  full_name: tanksense
+  vendor: Ondera
+  socs:
+    - name: nrf52840
