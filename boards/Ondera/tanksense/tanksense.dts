@@ -1,22 +1,55 @@
 /dts-v1/;
 
 #include <nordic/nrf52840_qiaa.dtsi>
+#include <zephyr/dt-bindings/regulator/nrf5x.h>
 #include "tanksense-pinctrl.dtsi"
 
 / {
-	model = "Tankse Monitoring";
+	model = "Ondera TankSense";
 	compatible = "Ondera,tanksense";
 
 	chosen {
 		zephyr,sram = &sram0;
 		zephyr,flash = &flash0;
 		zephyr,code-partition = &slot0_partition;
-		zephyr,ieee802154 = &ieee802154;
+	};
+
+	/* Board control pins, from the 02_NRF52840 sheet */
+	zephyr,user {
+		eg800q-pwr-en-gpios    = <&gpio1 11 GPIO_ACTIVE_HIGH>; /* U1 TPS22918 ON   */
+		radar-pwr-en-gpios     = <&gpio1 10 GPIO_ACTIVE_HIGH>; /* Q2 XC6220 CE     */
+		level-shifter-oe-gpios = <&gpio0 9  GPIO_ACTIVE_HIGH>; /* U6 TXS0108E OE   */
+		eg800q-pwrkey-gpios    = <&gpio0 15 GPIO_ACTIVE_HIGH>; /* via TXS - see HW issue */
+		eg800q-reset-gpios     = <&gpio0 17 GPIO_ACTIVE_HIGH>; /* via TXS - see HW issue */
+		eg800q-status-gpios    = <&gpio0 26 GPIO_ACTIVE_HIGH>;
+		vbatt-sense-en-gpios   = <&gpio1 13 GPIO_ACTIVE_HIGH>; /* Q3 BSS138 gate   */
+		reed-wake-gpios        = <&gpio1 12 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
 	};
 };
 
-&ieee802154 {
-	status = "okay";
+&gpiote { status = "okay"; };
+&gpio0  { status = "okay"; };
+&gpio1  { status = "okay"; };
+
+/* REG0 DC/DC (L2 on DCCH) and REG1 DC/DC (inductor inside MDBT50Q) */
+&reg0 { status = "okay"; };
+&reg1 { regulator-initial-mode = <NRF5X_REG_MODE_DCDC>; };
+
+/* Matches what we already wrote to UICR: reset on P0.18, NFC pins as GPIO */
+&uicr {
+	gpio-as-nreset;
+	nfct-pins-as-gpios;
+};
+
+/* EG800Q main UART - DISABLED until TX/RX direction is confirmed */
+&uart0 {
+	compatible = "nordic,nrf-uarte";
+	status = "disabled";
+	current-speed = <115200>;
+	pinctrl-0 = <&uart0_default>;
+	pinctrl-1 = <&uart0_sleep>;
+	pinctrl-names = "default", "sleep";
+	hw-flow-control;
 };
 
 &flash0 {
@@ -30,19 +63,16 @@
 			label = "mcuboot";
 			reg = <0x0 DT_SIZE_K(48)>;
 		};
-
 		slot0_partition: partition@c000 {
 			compatible = "zephyr,mapped-partition";
 			label = "image-0";
 			reg = <0xc000 DT_SIZE_K(472)>;
 		};
-
 		slot1_partition: partition@82000 {
 			compatible = "zephyr,mapped-partition";
 			label = "image-1";
 			reg = <0x82000 DT_SIZE_K(472)>;
 		};
-
 		storage_partition: partition@f8000 {
 			compatible = "zephyr,mapped-partition";
 			label = "storage";
