@@ -4,3 +4,5 @@ build_*/
 
 # VS Code local files
 .vscode/*.log
+.vscode/
+backups/

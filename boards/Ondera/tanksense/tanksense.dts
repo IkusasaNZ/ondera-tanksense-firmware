@@ -1,7 +1,6 @@
 /dts-v1/;
 
 #include <nordic/nrf52840_qiaa.dtsi>
-#include <zephyr/dt-bindings/regulator/nrf5x.h>
 #include "tanksense-pinctrl.dtsi"
 
 / {
@@ -31,13 +30,10 @@
 &gpio0  { status = "okay"; };
 &gpio1  { status = "okay"; };
 
-/* REG0 DC/DC (L2 on DCCH) and REG1 DC/DC (inductor inside MDBT50Q) */
-&reg0 { status = "okay"; };
-&reg1 { regulator-initial-mode = <NRF5X_REG_MODE_DCDC>; };
+/* DC/DC converters (reg0/reg1) deliberately NOT enabled - debug-loss investigation */
 
-/* Matches what we already wrote to UICR: reset on P0.18, NFC pins as GPIO */
+/* NFC pins as GPIO (matches factory UICR). PSELRESET deliberately NOT set. */
 &uicr {
-	gpio-as-nreset;
 	nfct-pins-as-gpios;
 };
 
