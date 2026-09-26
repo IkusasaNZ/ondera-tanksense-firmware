@@ -1,6 +1,7 @@
 /dts-v1/;
 
 #include <nordic/nrf52840_qiaa.dtsi>
+#include <zephyr/dt-bindings/regulator/nrf5x.h>
 #include "tanksense-pinctrl.dtsi"
 
 / {
@@ -30,7 +31,10 @@
 &gpio0  { status = "okay"; };
 &gpio1  { status = "okay"; };
 
-/* DC/DC converters (reg0/reg1) deliberately NOT enabled - debug-loss investigation */
+/* DC/DC converters: verified on board 2 not to affect SWD access.
+ * REG0 = high-voltage stage (L2 on DCCH), REG1 = main stage (inductor inside module). */
+&reg0 { status = "okay"; };
+&reg1 { regulator-initial-mode = <NRF5X_REG_MODE_DCDC>; };
 
 /* NFC pins as GPIO (matches factory UICR). PSELRESET deliberately NOT set. */
 &uicr {
