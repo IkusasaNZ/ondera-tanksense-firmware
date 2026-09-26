@@ -41,15 +41,15 @@
 	nfct-pins-as-gpios;
 };
 
-/* EG800Q main UART - DISABLED until TX/RX direction is confirmed */
+/* EG800Q main UART - directions confirmed; flow control off for first test */
 &uart0 {
 	compatible = "nordic,nrf-uarte";
-	status = "disabled";
+	status = "okay";
 	current-speed = <115200>;
 	pinctrl-0 = <&uart0_default>;
 	pinctrl-1 = <&uart0_sleep>;
 	pinctrl-names = "default", "sleep";
-	hw-flow-control;
+
 };
 
 &flash0 {
